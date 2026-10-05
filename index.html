@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emorce · DesHood Stand</title>
+  <meta name="description" content="Emorce DesHood Stand — full command bot for Da Hood / Des Hood" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050505;
+      --bg-elevated: #0c0c0c;
+      --bg-card: #111111;
+      --border: #1f1f1f;
+      --border-hover: #2a2a2a;
+      --text: #f0f0f0;
+      --text-muted: #8a8a8a;
+      --accent: #ff2d4a;
+      --accent-dim: #ff2d4a22;
+      --accent-glow: #ff2d4a55;
+      --green: #22c55e;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--green);
+      background: #22c55e15;
+      border: 1px solid #22c55e33;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    .logo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 40px 0 36px;
+    }
+
+    .stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      background: #141414;
+    }
+
+    .card.active {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, #161010 0%, #111111 100%);
+      box-shadow: 0 0 0 1px var(--accent-dim);
+    }
+
+    .card-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid #ff2d4a33;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--accent);
+      flex-shrink: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .card-info h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .card-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card-action {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+
+    .card:hover .card-action,
+    .card.active .card-action {
+      color: var(--accent);
+    }
+
+    .panel {
+      display: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 40px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .panel.open { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #0a0a0a;
+    }
+
+    .panel-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .panel-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .panel-close:hover {
+      color: var(--text);
+      background: #1a1a1a;
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    .config-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .config-row label {
+      font-size: 12px;
+      color: var(--text-muted);
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .config-row input {
+      flex: 1;
+      min-width: 160px;
+      background: #0a0a0a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .config-row input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { opacity: 0.9; }
+    .btn:active { transform: scale(0.98); }
+
+    .code-block {
+      background: #080808;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      margin-top: 8px;
+    }
+
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #d4d4d4;
+      white-space: pre-wrap;
+      word-break: break-all;
+      overflow-x: auto;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+    }
+
+    .copy-btn.copied {
+      color: var(--green);
+      border-color: #22c55e55;
+    }
+
+    .commands-section {
+      margin-top: 8px;
+    }
+
+    .cmd-group {
+      margin-bottom: 28px;
+    }
+
+    .cmd-group h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cmd-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .cmd-item {
+      display: grid;
+      grid-template-columns: minmax(140px, auto) 1fr;
+      gap: 12px;
+      align-items: baseline;
+      padding: 8px 12px;
+      background: #0a0a0a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .cmd-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .cmd-desc {
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    footer {
+      text-align: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #161616;
+      border: 1px solid #22c55e44;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 100;
+      box-shadow: 0 8px 32px #00000088;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 560px) {
+      .stats { grid-template-columns: 1fr; }
+      .cmd-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="container">
+    <header>
+      <div class="status">
+        <span class="status-dot"></span>
+        All Systems Operational
+      </div>
+      <div class="logo">Emorce</div>
+      <h1>DesHood Stand</h1>
+      <p class="subtitle">Full command bot · owner-protected · kill / fling / safe / bullet TP</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">1</div>
+        <div class="stat-label">Core Script</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">Full</div>
+        <div class="stat-label">Command Set</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Owner Locked</div>
+      </div>
+    </div>
+
+    <p class="section-title">Scripts</p>
+    <div class="cards">
+      <div class="card" id="card-stand" onclick="openPanel('stand')">
+        <div class="card-left">
+          <div class="card-icon">DH</div>
+          <div class="card-info">
+            <h3>DesHood Stand</h3>
+            <p>Roblox · Da Hood / Des Hood · Full bot + commands</p>
+          </div>
+        </div>
+        <span class="card-action">Open ›</span>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-stand">
+      <div class="panel-header">
+        <h2>DesHood Stand</h2>
+        <button class="panel-close" onclick="closePanel()" aria-label="Close">✕</button>
+      </div>
+      <div class="panel-body">
+        <div class="config-row">
+          <label>Bot Owner Username (live update)</label>
+          <input type="text" id="ownerInput" placeholder="your username" value="das_hood0003" spellcheck="false" />
+          <button class="btn" onclick="copyConfigured()">Copy Configured</button>
+        </div>
+
+        <div class="code-block">
+          <button class="copy-btn" id="copyMainBtn" onclick="copyConfigured()">Copy</button>
+          <pre id="scriptPreview">_G.BotOwner = "das_hood0003"
+loadstring(game:HttpGet("https://pastefy.app/DsIh89hM/raw"))()</pre>
+        </div>
+
+        <div class="commands-section" style="margin-top: 32px;">
+          <p class="section-title" style="margin-bottom: 16px;">Command Reference</p>
+
+          <div class="cmd-group">
+            <h3>⚡ General &amp; Stand</h3>
+            <div class="cmd-list">
+              <div class="cmd-item"><span class="cmd-name">.hide</span><span class="cmd-desc">Hides bot at a safe location</span></div>
+              <div class="cmd-item"><span class="cmd-name">.s</span><span class="cmd-desc">Teleports bot directly to owner</span></div>
+              <div class="cmd-item"><span class="cmd-name">.reset</span><span class="cmd-desc">Resets bot character</span></div>
+              <div class="cmd-item"><span class="cmd-name">.summon on</span><span class="cmd-desc">Summons bot behind owner (stand effect)</span></div>
+              <div class="cmd-item"><span class="cmd-name">.summon off</span><span class="cmd-desc">Disables summon / stand mode</span></div>
+              <div class="cmd-item"><span class="cmd-name">.chat disable / enable</span><span class="cmd-desc">Mute or restore bot chat replies</span></div>
+            </div>
+          </div>
+
+          <div class="cmd-group">
+            <h3>🔫 Combat &amp; Targeting</h3>
+            <div class="cmd-list">
+              <div class="cmd-item"><span class="cmd-name">.kill [name]</span><span class="cmd-desc">Loop-kills target until cancelled</span></div>
+              <div class="cmd-item"><span class="cmd-name">.kill [p1,p2,p3]</span><span class="cmd-desc">Multi-target simultaneous kill queue</span></div>
+              <div class="cmd-item"><span class="cmd-name">.kill off</span><span class="cmd-desc">Stops all active kill loops</span></div>
+              <div class="cmd-item"><span class="cmd-name">.kill aura</span><span class="cmd-desc">Auto-kills players within range</span></div>
+              <div class="cmd-item"><span class="cmd-name">.kill aura off</span><span class="cmd-desc">Disables kill aura</span></div>
+              <div class="cmd-item"><span class="cmd-name">.set [range]</span><span class="cmd-desc">Adjusts aura distance (studs)</span></div>
+              <div class="cmd-item"><span class="cmd-name">.stompall on / off</span><span class="cmd-desc">Auto-stomps all knocked players</span></div>
+              <div class="cmd-item"><span class="cmd-name">.gm revolver / shotgun</span><span class="cmd-desc">Switch bot weapon</span></div>
+            </div>
+          </div>
+
+          <div class="cmd-group">
+            <h3>🌀 Fling &amp; Physics</h3>
+            <div class="cmd-list">
+              <div class="cmd-item"><span class="cmd-name">.fling aura</span><span class="cmd-desc">Flings anyone who gets too close</span></div>
+              <div class="cmd-item"><span class="cmd-name">.unfling aura</span><span class="cmd-desc">Disables proximity fling</span></div>
+              <div class="cmd-item"><span class="cmd-name">.f [name]</span><span class="cmd-desc">Launches target into the sky</span></div>
+              <div class="cmd-item"><span class="cmd-name">.f off</span><span class="cmd-desc">Cancels active fling target</span></div>
+              <div class="cmd-item"><span class="cmd-name">.flingmod 1 / 2</span><span class="cmd-desc">Standard vs physics fling mode</span></div>
+            </div>
+          </div>
+
+          <div class="cmd-group">
+            <h3>🛡️ Utility &amp; Protection</h3>
+            <div class="cmd-list">
+              <div class="cmd-item"><span class="cmd-name">.safe on / off</span><span class="cmd-desc">Auto-defends owner against attackers</span></div>
+              <div class="cmd-item"><span class="cmd-name">.protect [name]</span><span class="cmd-desc">Protect a specific player</span></div>
+              <div class="cmd-item"><span class="cmd-name">.protect off</span><span class="cmd-desc">Stop protect mode</span></div>
+              <div class="cmd-item"><span class="cmd-name">.bring [name]</span><span class="cmd-desc">Teleport target to owner</span></div>
+              <div class="cmd-item"><span class="cmd-name">.drop</span><span class="cmd-desc">Drop currently carried player</span></div>
+              <div class="cmd-item"><span class="cmd-name">.bullet tp on / off</span><span class="cmd-desc">Bullet TP (aim returns target position)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Emorce · DesHood Stand · built for Axion<br />
+      <span style="opacity:0.7">Owner-only commands · full auto · anti-void · wallbang ready</span>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard</div>
+
+  <script>
+    const PASTE_URL = 'https://pastefy.app/DsIh89hM/raw';
+
+    function getOwner() {
+      const v = document.getElementById('ownerInput').value.trim();
+      return v || 'das_hood0003';
+    }
+
+    function buildScript() {
+      const owner = getOwner();
+      return `_G.BotOwner = "${owner}"\nloadstring(game:HttpGet("${PASTE_URL}"))()`;
+    }
+
+    function updatePreview() {
+      document.getElementById('scriptPreview').textContent = buildScript();
+    }
+
+    document.getElementById('ownerInput').addEventListener('input', updatePreview);
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg || 'Copied to clipboard';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+        if (btn) {
+          const prev = btn.textContent;
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = prev;
+            btn.classList.remove('copied');
+          }, 1400);
+        }
+      });
+    }
+
+    function copyConfigured() {
+      const text = buildScript();
+      copyText(text, document.getElementById('copyMainBtn'));
+    }
+
+    function openPanel(id) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+      const panel = document.getElementById('panel-' + id);
+      const card = document.getElementById('card-' + id);
+      if (panel) panel.classList.add('open');
+      if (card) card.classList.add('active');
+      panel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function closePanel() {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    }
+
+    openPanel('stand');
+  </script>
+</body>
+</html>
